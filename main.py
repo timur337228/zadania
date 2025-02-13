@@ -1,11 +1,13 @@
 import random
 
-from flask import Flask, request
-from flask import url_for
-import re
+from flask import Flask, request, url_for, redirect, render_template_string
+import re, os
 
 i = 0
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'static/img'
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
 
 @app.route('/index')
@@ -190,6 +192,47 @@ def result_otbor(nickname, level: int, rating: float):
                     <div class="alert alert-warning"role="alert">Желаем удачи!</div>
                   </body>
                 </html>"""
+
+
+@app.route('/load_photo', methods=['POST', 'GET'])
+def load_photo():
+    if request.method == 'POST':
+        if 'photo' in request.files:
+            photo = request.files['photo']
+            if photo.filename != '':
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], photo.filename)
+                photo.save(filepath)
+    return render_template_string('''
+            <!doctype html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                <link rel="stylesheet"
+                href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+                integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+                crossorigin="anonymous">
+                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" />
+                <title>Отбор астронавтов</title>
+              </head>
+              <body>
+                <div>
+                    <h1>Загрузка фотографии</h1>
+                    <h2>для участия в миссии</h2>
+                    <form class="login_form" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="photo">Приложите фотографию</label>
+                            <input type="file" class="form-control-file" id="photo" name="photo">
+                            {% if photo_url %}
+                            <img src="{{ photo_url }}"style="max-width: 100%; height: auto;">
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                    </form>
+                </div>
+              </body>
+            </html>
+        ''', photo_url=f'static/img/{photo.filename}' if request.method == 'POST' else None)
 
 
 if __name__ == '__main__':
