@@ -141,5 +141,36 @@ def form_sample():
         return "Форма отправлена"
 
 
+@app.route('/choice/<planet>')
+def choice_planet(planet):
+    g = ['Эта планета близка к земле;',
+         "На ней много необходимых ресурсов;",
+         'На ней есть вода и атмосфера;',
+         'Наа ней есть небольшое магнитное поле;']
+    random.shuffle(g)
+    g.append('Наконец, она просто красива!')
+    h = []
+    bootstrap = ['secondary', 'success', 'danger', 'warning']
+    for i in range(1, len(g)):
+        h.append(f'<div class="alert alert-{random.choice(bootstrap)}"role="alert">{g[i]}')
+
+    return f"""<!doctype html>
+                <html lang="en">
+                  <head>
+                    <meta charset="utf-8">
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+                    <link rel="stylesheet" type="text/css" href="{url_for('static', filename='css/style.css')}"/>
+                    <title>Варианты выбора</title>
+                  </head>
+                  <body>
+                    <h1>Мое предложение: {planet}</h1>
+                    <div class="main">
+                    </br>{g[0]}
+                    {'</div>'.join(h[1:])}
+                    </div>
+                  </body>
+                </html>"""
+
+
 if __name__ == '__main__':
     app.run(port=8080, host='127.0.0.1')
