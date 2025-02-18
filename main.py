@@ -235,5 +235,57 @@ def load_photo():
         ''', photo_url=f'static/img/{photo.filename}' if request.method == 'POST' else None)
 
 
+@app.route("/carousel")
+def carousel():
+    sledes = []
+    li = []
+    for indx, i in enumerate(os.listdir('static/giants')):
+        if indx == 0:
+            li.append(
+                f'''<li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{indx}" class="active"></li>''')
+            sledes.append(f'''<div class="carousel-item active">
+                  <img class="d-block w-100" src="static/giants/{i}" alt="{i}">
+                </div>''')
+        else:
+            li.append(f'''<li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{indx}"></li>''')
+            sledes.append(f'''<div class="carousel-item">
+                              <img class="d-block w-100" src="static/giants/{i}" alt="{i}">
+                            </div>''')
+
+    return f"""<!doctype html>
+                <html lang="en">
+                  <head>
+                    <meta charset="utf-8">
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+                    <link rel="stylesheet" type="text/css" href="{url_for('static', filename='css/style.css')}"/>
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+                    <title>Варианты выбора</title>
+                  </head>
+                  <body>
+                    <h1>Пейзажи</h1>
+                    <div class="container w-50"> 
+                        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                          <ol class="carousel-indicators">
+                            {"".join(li)}
+                          </ol>
+                          <div class="carousel-inner">
+                            {"".join(sledes)}
+                          </div>
+                          <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                          </a>
+                          <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                          </a>
+                        </div>
+                    </div>
+                  </body>
+                </html>"""
+
+
 if __name__ == '__main__':
     app.run(port=8080, host='127.0.0.1')
